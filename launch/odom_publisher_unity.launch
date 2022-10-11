@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="hz" default="10"/>
+
+    <node pkg="odom_publisher_unity" type="odom_publisher_unity" name="odom_publisher_unity" output="screen">
+        <param name="hz" value="$(arg hz)"/>
+    </node>
+
+</launch>
