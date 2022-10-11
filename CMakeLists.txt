@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(odom_publisher_unity)
 
+SET(CMAKE_CXX_FLAGS "-std=c++11 -O2 -g -Wall ${CMAKE_CXX_FLAGS}")    
+
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
 
