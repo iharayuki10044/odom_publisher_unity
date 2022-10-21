@@ -7,6 +7,6 @@
     </node>
 
     <!-- tf x y z rool pitch yaw parent child -->
-    <node pkg="tf" type="static_transform_publisher" name="unity_to_map_tf" args="59.484 220.64 -25.31 1.9809 -2.34687 93.5639  Unity map 100"/>
+    <node pkg="tf" type="static_transform_publisher" name="unity_to_map_tf" args="-59.484 -220.64 25.31 -1.9809 2.34687 -93.5639  Unity map 100"/>
 
 </launch>
