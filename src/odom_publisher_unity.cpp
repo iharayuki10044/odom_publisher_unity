@@ -1,13 +1,15 @@
 #include "odom_publisher_unity/odom_publisher_unity.h"
 
 OdomPublisherUnity::OdomPublisherUnity()
-    : private_nh("~")
+    : private_nh("~"), tfBuffer(), tfListener(tfBuffer)
 {
     private_nh.param("HZ", HZ, 10.0);
 
-    odom_sub = private_nh.subscribe("/odom_unit04", 1, &OdomPublisherUnity::odom_callback, this);     
+    // odom_sub = private_nh.subscribe("/odom_unit04", 1, &OdomPublisherUnity::odom_callback, this); 
     // odom_tf_pub = new tf::TransformBroadcaster();
     // odom_tf_listener = new tf::TransformListener();
+
+    unity_sub = private_nh.subscribe("/unit04_unity_pose", 1, &OdomPublisherUnity::unity_callback, this);
 
     pose_pub = private_nh.advertise<geometry_msgs::PoseStamped>("/pose", 1);
 
@@ -40,7 +42,7 @@ void OdomPublisherUnity::odom_callback(const nav_msgs::Odometry& msg)
     robot_pose.header.stamp = ros::Time::now();
 
     // 座標系map と　robot の指定
-    robot_pose.header.frame_id = "map";
+    robot_pose.header.frame_id = "odom";
     robot_pose.child_frame_id = "base_footprint";
 
     robot_pose.transform.translation.x = x;
@@ -55,7 +57,47 @@ void OdomPublisherUnity::odom_callback(const nav_msgs::Odometry& msg)
 
     // std::cout << "odom tf send ok" << std::endl;
 
-} 
+}
+
+void OdomPublisherUnity::unity_callback(const geometry_msgs::PoseStamped& msg)
+{
+
+    unity_pose = msg;
+    unity_subscribed = true;
+
+    if(is_firstmsgs){
+        init_unity_pose = unity_pose;
+        is_firstmsgs = false;
+    }
+    geometry_msgs::TransformStamped map_to_basefoot;
+
+    geometry_msgs::TransformStamped unity_to_map;
+    try{
+       unity_to_map = tfBuffer.lookupTransform( "map", "Unity", ros::Time(0)); 
+    }
+    catch (tf2::TransformException &ex) {
+        ROS_WARN("%s",ex.what());
+        ros::Duration(1.0).sleep();
+        return;
+    }
+
+    geometry_msgs::PoseStamped map_pose;
+    tf2::doTransform(unity_pose, map_pose, unity_to_map);
+
+    map_to_basefoot.header.stamp = ros::Time::now();
+    map_to_basefoot.header.frame_id = "map";
+    map_to_basefoot.child_frame_id = "base_footprint";
+
+    map_to_basefoot.transform.translation.x = map_pose.pose.position.x;
+    map_to_basefoot.transform.translation.y = map_pose.pose.position.y;
+    map_to_basefoot.transform.translation.z = map_pose.pose.position.z;
+    map_to_basefoot.transform.rotation = map_pose.pose.orientation;
+
+    robot_pose_broadcaster.sendTransform(map_to_basefoot);
+
+    pose_pub.publish(map_pose);
+
+}
 
 void OdomPublisherUnity::process()
 {

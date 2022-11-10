@@ -13,6 +13,7 @@
 
 #include <eigen3/Eigen/Dense> 
 
+#include <tf2/utils.h>
 #include <tf2_ros/transform_broadcaster.h>
 
 class OdomPublisherUnity{
@@ -46,6 +47,8 @@ class OdomPublisherUnity{
         ros::Subscriber odom_sub;
         ros::Publisher pose_pub;
 
+        tf2_ros::Buffer tfBuffer;
+
         //TF Broadcasterの実体化
         // tf unity to map 
         tf2_ros::TransformBroadcaster robot_pose_broadcaster;
@@ -53,6 +56,7 @@ class OdomPublisherUnity{
         // tf map to basefoot
         tf2_ros::TransformBroadcaster map_to_basefoot_broadcaster;
 
+        tf2_ros::TransformListener tfListener;
 
 };
 
