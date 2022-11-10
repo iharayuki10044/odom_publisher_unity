@@ -85,7 +85,7 @@ void OdomPublisherUnity::unity_callback(const geometry_msgs::PoseStamped& msg)
     tf2::doTransform(unity_pose, map_pose, unity_to_map);
 
     map_to_basefoot.header.stamp = ros::Time::now();
-    map_to_basefoot.header.frame_id = "map";
+    map_to_basefoot.header.frame_id = "odom";
     map_to_basefoot.child_frame_id = "base_footprint";
 
     map_to_basefoot.transform.translation.x = map_pose.pose.position.x;
