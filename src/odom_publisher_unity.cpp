@@ -73,7 +73,7 @@ void OdomPublisherUnity::unity_callback(const geometry_msgs::PoseStamped& msg)
 
     geometry_msgs::TransformStamped unity_to_map;
     try{
-       unity_to_map = tfBuffer.lookupTransform( "map", "Unity", ros::Time(0)); 
+       unity_to_map = tfBuffer.lookupTransform( "odom", "Unity", ros::Time(0)); 
     }
     catch (tf2::TransformException &ex) {
         ROS_WARN("%s",ex.what());
@@ -81,8 +81,15 @@ void OdomPublisherUnity::unity_callback(const geometry_msgs::PoseStamped& msg)
         return;
     }
 
+
     geometry_msgs::PoseStamped map_pose;
     tf2::doTransform(unity_pose, map_pose, unity_to_map);
+
+    // std::cout << "===== unity pose =====" << std::endl;
+    // std::cout << unity_pose << std::endl;
+
+    // std::cout << "===== map pose =====" << std::endl;
+    // std::cout << map_pose << std::endl;
 
     map_to_basefoot.header.stamp = ros::Time::now();
     map_to_basefoot.header.frame_id = "odom";
@@ -94,6 +101,8 @@ void OdomPublisherUnity::unity_callback(const geometry_msgs::PoseStamped& msg)
     map_to_basefoot.transform.rotation = map_pose.pose.orientation;
 
     robot_pose_broadcaster.sendTransform(map_to_basefoot);
+
+    map_pose.header.frame_id = "base_footprint";     
 
     pose_pub.publish(map_pose);
 
