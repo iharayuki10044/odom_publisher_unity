@@ -37,6 +37,9 @@ class OdomPublisherUnity{
         geometry_msgs::PoseStamped init_unity_pose;
         geometry_msgs::PoseStamped unity_odom_pose;
 
+        geometry_msgs::PoseStamped map_past_pose;
+
+
         nav_msgs::Odometry odom_pose;
 
         ros::NodeHandle private_nh;
